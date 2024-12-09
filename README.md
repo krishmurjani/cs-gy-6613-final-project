@@ -82,7 +82,7 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
    ```bash
    docker-compose up --build
    ```
-3. Access the Gradio app at [http://localhost:8000](http://127.0.0.1:7861/).
+3. Access the Gradio app at [http://localhost:8000](http://127.0.0.1:7861/)](http://127.0.0.1:7861/).
 
 ---
 
@@ -121,7 +121,7 @@ Screenshots and project outputs are available in the `notebooks` directory, cove
 ---
 
 ## Acknowledgments
-- **GitHub IDs:** - ([Krish Murjani](https://huggingface.co/krishmurjani)) & ([Shresth Kapoor](https://huggingface.co/shresthkapoor7))
+- **GitHub IDs:** - ([Krish Murjani](https://github.com/krishmurjani)) & ([Shresth Kapoor](https://github.com/shresthkapoor7))
 - **HuggingFace Hub:** Custom finetuned models uploaded.
 
 ---
