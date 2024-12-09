@@ -8,30 +8,30 @@ from qdrant_client import QdrantClient
 from clearml import Task
 
 def main():
-    # Step 0: Initialize ClearML
+    # init clearml task
     task = Task.init(
-        project_name="AI Project",
-        task_name="Pipeline Execution",
+        project_name="ai project",
+        task_name="pipeline execution",
         task_type=Task.TaskTypes.training,
     )
     logger = task.get_logger()
 
-    # Step 1: Initialize MongoDB and Qdrant
-    logger.report_text("Initializing MongoDB and Qdrant...")
-    print("Initializing MongoDB and Qdrant...")
+    # init mongodb and qdrant
+    logger.report_text("initializing mongodb and qdrant...")
+    print("initializing mongodb and qdrant...")
     mongo_client = MongoClient("mongodb://localhost:27017/")
     github_collection = mongo_client["github_scraper"]["repositories"]
     medium_collection = mongo_client["medium_scraper"]["articles"]
-
     qdrant_client = QdrantClient(url="http://localhost:6333")
 
-    # Step 2: Scraping
-    logger.report_text("Starting scrapers...")
-    print("Starting scrapers...")
+    # start scrapers
+    logger.report_text("starting scrapers...")
+    print("starting scrapers...")
     github_crawler = GithubCrawler(github_collection)
     medium_crawler = MediumCrawler(medium_collection)
 
-    test_user = {"id": str(uuid.uuid4()), "full_name": "Test User"}
+    test_user = {"id": str(uuid.uuid4()), "full_name": "test user"}
+
     github_crawler.extract(
         link="https://github.com/ros-controls/ros2_controllers",
         user=test_user
@@ -43,9 +43,9 @@ def main():
     )
     medium_crawler.close()
 
-    # Step 3: Cleaning with DataPipeline
-    logger.report_text("Starting cleaning...")
-    print("Starting cleaning...")
+    # clean scraped data
+    logger.report_text("starting cleaning...")
+    print("starting cleaning...")
 
     medium_pipeline = DataPipeline(
         mongo_collection=medium_collection,
@@ -54,9 +54,9 @@ def main():
     )
 
     medium_ids = [doc["_id"] for doc in medium_collection.find()]
-    logger.report_text(f"Medium article IDs: {medium_ids}")
+    logger.report_text(f"medium article ids: {medium_ids}")
     for medium_article_id in medium_ids:
-        print(f"Processing Medium article ID: {medium_article_id}")
+        print(f"processing medium article id: {medium_article_id}")
         medium_pipeline.process_medium_article_by_id(medium_article_id)
 
     github_pipeline = DataPipeline(
@@ -66,14 +66,14 @@ def main():
     )
 
     github_ids = [doc["_id"] for doc in github_collection.find()]
-    logger.report_text(f"GitHub repository IDs: {github_ids}")
+    logger.report_text(f"github repository ids: {github_ids}")
     for repository_id in github_ids:
-        print(f"Processing GitHub repository ID: {repository_id}")
+        print(f"processing github repository id: {repository_id}")
         github_pipeline.process_repository_by_id(repository_id)
 
-    # Step 4: Retrieval and Response
-    logger.report_text("Starting retriever...")
-    print("Starting retriever...")
+    # start retriever
+    logger.report_text("starting retriever...")
+    print("starting retriever...")
     embedding_model = EmbeddingModel()
     retriever = Retriever(
         qdrant_client=qdrant_client,
@@ -85,9 +85,9 @@ def main():
     ollama_handler = OllamaHandler()
     retriever_with_ollama = RetrieverWithOllama(retriever=retriever, ollama_handler=ollama_handler)
 
-    # Step 5: Launch Gradio App
-    logger.report_text("Launching Gradio app...")
-    print("Launching Gradio app...")
+    # launch web app
+    logger.report_text("launching gradio app...")
+    print("launching gradio app...")
     start_gradio_app(retriever_with_ollama)
 
 

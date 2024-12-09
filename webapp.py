@@ -2,6 +2,7 @@ import gradio as gr
 from typing import List, Dict
 from retriever import OllamaHandler, Retriever, QdrantClient, EmbeddingModel
 
+# init retriever components
 qdrant_client = QdrantClient(url="http://localhost:6333")
 retriever = Retriever(
     qdrant_client=qdrant_client,
@@ -17,6 +18,7 @@ class RetrieverWithOllama:
         self.ollama_handler = ollama_handler
 
     def retrieve_and_respond(self, query: str, top_k: int = 5) -> str:
+        # retrieve and generate response
         try:
             github_results = self.retriever.retrieve(
                 query, top_k=top_k, collection=self.retriever.github_collection_name
@@ -27,10 +29,9 @@ class RetrieverWithOllama:
             )
 
             combined_results = github_results + medium_results
-
             return self.ollama_handler.send_prompt(query, combined_results)
         except Exception as e:
-            return f"Error: {str(e)}"
+            return f"error: {str(e)}"
 
 retriever_with_ollama = RetrieverWithOllama(retriever=retriever, ollama_handler=ollama_handler)
 
@@ -38,19 +39,12 @@ questions = [
     "What is ROS?",
     "Steps to install ROS?",
     "What is the latest version of ROS?",
-    "How can I navigate to a specific pose?",
-    "What are the benefits of cloud computing?"
+    "Tell me how can I navigate to a specific pose - include replanning aspects in your answer.",
+	"Tell me how can I navigate to a specific pose - include replanning aspects in your answer. Can you provide me with code for this task?"
 ]
 
-
 def start_gradio_app(retriever_with_ollama: RetrieverWithOllama):
-    """
-    Start the Gradio application using the provided retriever with Ollama.
-
-    Args:
-        retriever_with_ollama (RetrieverWithOllama): A retriever that integrates
-                                                     retrieval and response generation.
-    """
+    # launch gradio app
     def get_answer(query: str) -> str:
         return retriever_with_ollama.retrieve_and_respond(query, top_k=5)
 
@@ -58,8 +52,9 @@ def start_gradio_app(retriever_with_ollama: RetrieverWithOllama):
         fn=get_answer,
         inputs=gr.Dropdown(choices=questions, label="Select a question"),
         outputs=gr.Textbox(label="Response", lines=10),
-        title="ROS Query Application",
+        title="CS-GY-6613 AI Final Project: ROS Query App",
         description="Select a question from the dropdown and then click **Search** to get the answer.",
+        article="Created by Shresth Kapoor (sk11677) & Krish Murjani (km6520)"
     )
 
     demo.launch()

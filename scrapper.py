@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def get_mongo_collection(uri: str, db_name: str, collection_name: str):
-    """Returns a MongoDB collection."""
+    # connect to mongodb
     client = MongoClient(uri)
     db = client[db_name]
     return db[collection_name]
@@ -28,18 +28,17 @@ class GithubCrawler:
         self.collection = mongo_collection
 
     def extract(self, link: str, user: Dict) -> None:
-        """Extracts content from a GitHub repository and saves it to MongoDB."""
+        # extract github repo content and save to mongodb
         if self.collection.find_one({"link": link}):
-            logger.info(f"Repository already exists in the database: {link}")
+            logger.info(f"repository already exists: {link}")
             return
 
-        logger.info(f"Starting to scrape GitHub repository: {link}")
+        logger.info(f"starting github repo scrape: {link}")
         repo_name = link.rstrip("/").split("/")[-1]
         local_temp = tempfile.mkdtemp()
 
         try:
             subprocess.run(["git", "clone", link], check=True, cwd=local_temp)
-
             repo_path = os.path.join(local_temp, os.listdir(local_temp)[0])
 
             tree = {}
@@ -56,7 +55,7 @@ class GithubCrawler:
                         with open(os.path.join(root, file), "r", errors="ignore") as f:
                             tree[file_path] = f.read().strip()
                     except Exception as e:
-                        logger.warning(f"Failed to read file {file_path}: {e}")
+                        logger.warning(f"failed to read file {file_path}: {e}")
 
             repo_data = {
                 "_id": str(uuid.uuid4()),
@@ -68,15 +67,15 @@ class GithubCrawler:
                 "author_full_name": user["full_name"],
             }
             self.collection.insert_one(repo_data)
-            logger.info(f"Repository {repo_name} saved successfully.")
+            logger.info(f"repository {repo_name} saved.")
         except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to clone repository: {e}")
+            logger.error(f"failed to clone repo: {e}")
         except errors.PyMongoError as e:
-            logger.error(f"Failed to save data to MongoDB: {e}")
+            logger.error(f"failed to save to mongodb: {e}")
         finally:
             shutil.rmtree(local_temp)
 
-        logger.info(f"Finished scraping GitHub repository: {link}")
+        logger.info(f"finished scraping github repo: {link}")
 
 class MediumCrawler:
     def __init__(self, mongo_collection):
@@ -87,7 +86,7 @@ class MediumCrawler:
         self.driver = webdriver.Chrome(service=service, options=self.options)
 
     def scroll_page(self, scroll_pause_time=1):
-        """Scroll down the page to load more content."""
+        # scroll to load full page
         last_height = self.driver.execute_script("return document.body.scrollHeight")
 
         while True:
@@ -100,12 +99,12 @@ class MediumCrawler:
             last_height = new_height
 
     def extract(self, link: str, user: Optional[dict] = None):
-        """Extract content from a Medium article."""
+        # extract medium article content
         if self.collection.find_one({"link": link}):
-            logger.info(f"Article already exists in the database: {link}")
+            logger.info(f"article already exists: {link}")
             return
 
-        logger.info(f"Starting to scrape Medium article: {link}")
+        logger.info(f"starting medium scrape: {link}")
         self.driver.get(link)
         self.scroll_page()
 
@@ -133,12 +132,12 @@ class MediumCrawler:
 
         try:
             self.collection.insert_one(doc)
-            logger.info(f"Successfully scraped and saved article: {link}")
+            logger.info(f"article saved: {link}")
         except errors.PyMongoError as e:
-            logger.error(f"Failed to save article to MongoDB: {e}")
+            logger.error(f"failed to save article: {e}")
 
         return data
 
     def close(self):
-        """Close the driver."""
+        # close web driver
         self.driver.quit()

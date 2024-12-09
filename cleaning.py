@@ -11,32 +11,29 @@ from qdrant_client.models import VectorParams, Distance, PointStruct
 from sentence_transformers import SentenceTransformer
 
 class DataCategory(str, Enum):
-    POSTS = "posts"
-    ARTICLES = "articles"
-    REPOSITORIES = "repositories"
-    QUERIES = "queries"
-
+    posts = "posts"
+    articles = "articles"
+    repositories = "repositories"
+    queries = "queries"
 
 class BaseDocument(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
 
     @classmethod
     def from_mongo(cls, data: dict):
-        """Convert MongoDB document to a BaseDocument."""
+        # map mongo id to base document id
         data["id"] = data.pop("_id")
         return cls(**data)
-
 
 class VectorBaseDocument(BaseDocument):
     content: str
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class CleaningHandler:
     @staticmethod
     def _clean_text(text: str) -> str:
-        """Clean text by removing unwanted characters and extra spaces."""
-        if not isinstance(text, str):  # Ensure the input is a string
+        # remove unwanted chars and extra spaces
+        if not isinstance(text, str):
             text = str(text) if text is not None else ""
         text = re.sub(r"[^\w\s.,!?]", " ", text)
         return re.sub(r"\s+", " ", text).strip()
@@ -59,10 +56,10 @@ class CleaningHandler:
         }
 
     def clean_article(self, data: Dict) -> Dict:
-        """Clean a Medium article's content."""
+        # clean article content
         content_data = data.get("content", {})
         return {
-            "id": data.get("_id", str(uuid.uuid4())),  # Ensure `id` is available
+            "id": data.get("_id", str(uuid.uuid4())),
             "title": self._clean_text(content_data.get("Title", "")),
             "subtitle": self._clean_text(content_data.get("Subtitle", "")),
             "content": self._clean_text(content_data.get("Content", "")),
@@ -70,11 +67,8 @@ class CleaningHandler:
             "platform": data.get("platform", "medium"),
         }
 
-
 def chunk_text(text: str, chunk_size: int = 500, chunk_overlap: int = 50) -> List[str]:
-    """
-    Split text into chunks of specified size with overlap.
-    """
+    # split text into overlapping chunks
     sentences = re.split(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s", text)
     chunks, current_chunk = [], ""
 
@@ -90,29 +84,26 @@ def chunk_text(text: str, chunk_size: int = 500, chunk_overlap: int = 50) -> Lis
 
     return chunks
 
-
 class ChunkingHandler:
     def chunk(self, cleaned_content: str) -> List[Dict[str, str]]:
-        """Split cleaned content into chunks and return as dictionaries."""
+        # split content into chunks
         chunks = chunk_text(cleaned_content)
         return [{"content": chunk} for chunk in chunks]
-
 
 class EmbeddingModel:
     def __init__(self):
         self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
     def embed(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for a list of texts."""
+        # generate embeddings
         return self.model.encode(texts, convert_to_tensor=False)
-
 
 class EmbeddingHandler:
     def __init__(self, embedding_model: EmbeddingModel):
         self.embedding_model = embedding_model
 
     def embed_chunks(self, chunks: List[Dict[str, str]]) -> List[Dict[str, Any]]:
-        """Embed text chunks and return them with their embeddings."""
+        # embed text chunks
         embedded_chunks = []
         for chunk in chunks:
             embedding = self.embedding_model.embed([chunk["content"]])[0]
@@ -123,9 +114,8 @@ class EmbeddingHandler:
             })
         return embedded_chunks
 
-
 def convert_numpy_to_list(data: Any) -> Any:
-    """Recursively convert NumPy arrays to Python lists."""
+    # recursively convert numpy arrays to lists
     if isinstance(data, np.ndarray):
         return data.tolist()
     elif isinstance(data, dict):
@@ -133,7 +123,6 @@ def convert_numpy_to_list(data: Any) -> Any:
     elif isinstance(data, list):
         return [convert_numpy_to_list(v) for v in data]
     return data
-
 
 class DataPipeline:
     def __init__(self, mongo_collection, qdrant_client: QdrantClient, qdrant_collection_name: str):
@@ -147,7 +136,7 @@ class DataPipeline:
         self._ensure_qdrant_collection()
 
     def _ensure_qdrant_collection(self):
-        """Ensure the Qdrant collection exists, create it if not."""
+        # check and create qdrant collection if missing
         collections = self.qdrant_client.get_collections()
         if self.qdrant_collection not in [c.name for c in collections.collections]:
             self.qdrant_client.create_collection(
@@ -156,10 +145,10 @@ class DataPipeline:
             )
 
     def process_medium_article_by_id(self, article_id: str):
-        """Fetch Medium article by ID, process, and store it in Qdrant."""
+        # process article by id
         raw_data = self.mongo_collection.find_one({"_id": article_id})
         if not raw_data:
-            print(f"No article found with id: {article_id}")
+            print(f"no article found with id: {article_id}")
             return
 
         cleaned_data = self.cleaning_handler.clean_article(raw_data)
@@ -175,13 +164,13 @@ class DataPipeline:
             for chunk in embedded_chunks
         ]
         self.qdrant_client.upsert(collection_name=self.qdrant_collection, points=points)
-        print(f"Medium article {article_id} processed and stored in Qdrant successfully.")
+        print(f"medium article {article_id} processed and stored in qdrant successfully.")
 
     def process_repository_by_id(self, repo_id: str):
-        """Fetch raw data from MongoDB, process it, and store in Qdrant."""
+        # process repository by id
         raw_data = self.mongo_collection.find_one({"_id": repo_id})
         if not raw_data:
-            print(f"No repository found with id: {repo_id}")
+            print(f"no repository found with id: {repo_id}")
             return
 
         cleaned_data = self.cleaning_handler.clean_repository(raw_data)
@@ -197,4 +186,4 @@ class DataPipeline:
             for chunk in embedded_chunks
         ]
         self.qdrant_client.upsert(collection_name=self.qdrant_collection, points=points)
-        print(f"Repository {repo_id} processed and stored in Qdrant successfully.")
+        print(f"repository {repo_id} processed and stored in qdrant successfully.")
