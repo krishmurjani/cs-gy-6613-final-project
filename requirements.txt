@@ -1,0 +1,10 @@
+numpy
+pydantic
+pymongo
+qdrant-client
+sentence-transformers
+selenium
+webdriver-manager
+beautifulsoup4
+requests
+gradio
