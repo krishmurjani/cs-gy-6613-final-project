@@ -148,7 +148,7 @@ Screenshots and project outputs are available in the `notebooks` directory, cove
 ## Acknowledgments
 - **GitHub IDs:** - ([Krish Murjani](https://github.com/krishmurjani)) & ([Shresth Kapoor](https://github.com/shresthkapoor7))
 - **Hugging Face IDs:** ([Krish Murjani](https://huggingface.co/krishmurjani)) & ([Shresth Kapoor ](https://huggingface.co/shresthkapoor7))
-- **HuggingFace Hub:** Custom finetuned models uploaded above. [Jump to Hugging Face Section]((#hugging-face-hub-model-repository))
+- **HuggingFace Hub:** Custom finetuned models uploaded above. [Jump to Hugging Face Section](#hugging-face-hub-model-repository)
 
 ---
 
