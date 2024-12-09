@@ -105,7 +105,7 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
 Screenshots and project outputs are available in the `notebooks` directory, covering all milestones.
 ## Project Demo
 
-![Project Demo](5.jpg)
+![Project Demo](screenshots/5.jpg)
 
 ---
 
