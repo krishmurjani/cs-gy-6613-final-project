@@ -3,9 +3,8 @@ pydantic
 pymongo
 qdrant-client
 sentence-transformers
-selenium
+selenium==4.27.1
 webdriver-manager
 beautifulsoup4
 requests
 gradio
-clearml

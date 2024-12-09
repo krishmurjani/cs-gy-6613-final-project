@@ -3,7 +3,7 @@ from typing import List, Dict
 from retriever import OllamaHandler, Retriever, QdrantClient, EmbeddingModel
 
 # init retriever components
-qdrant_client = QdrantClient(url="http://localhost:6333")
+qdrant_client = QdrantClient(url="http://qdrant:6333")
 retriever = Retriever(
     qdrant_client=qdrant_client,
     github_collection_name="repository_chunks",
@@ -55,6 +55,6 @@ def start_gradio_app(retriever_with_ollama: RetrieverWithOllama):
         title="CS-GY-6613 AI Final Project: ROS Query App",
         description="Select a question from the dropdown and then click **Search** to get the answer.",
         article="Created by Shresth Kapoor (sk11677) & Krish Murjani (km6520)"
-    )
+    ).launch(server_name="0.0.0.0", server_port=7860)
 
     demo.launch()

@@ -107,7 +107,7 @@ print(outputs)
    ```bash
    docker-compose up --build
    ```
-3. Access the Gradio app at [http://127.0.0.1:7861/](http://127.0.0.1:7861/).
+3. Access the Gradio app at [http://localhost:7860/](http://localhost:7860/).
 
 ---
 
@@ -131,7 +131,7 @@ Screenshots and project outputs are available in the `notebooks` directory, cove
 ## Project Demo
 
 ![Project Demo](screenshots/5.jpg)
-
+![Docker Container](screenshots/6.jpg)
 ---
 
 ## ClearML Screenshots

@@ -77,67 +77,68 @@ class GithubCrawler:
 
         logger.info(f"finished scraping github repo: {link}")
 
-class MediumCrawler:
-    def __init__(self, mongo_collection):
-        self.collection = mongo_collection
-        self.options = Options()
-        self.options.add_argument("--headless")
-        service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=service, options=self.options)
+# See notebook for medium crawler
+# class MediumCrawler:
+#     def __init__(self, mongo_collection):
+#         self.collection = mongo_collection
+#         self.options = Options()
+#         self.options.add_argument("--headless")
+#         service = Service(ChromeDriverManager().install())
+#         self.driver = webdriver.Chrome(service=service, options=self.options)
 
-    def scroll_page(self, scroll_pause_time=1):
-        # scroll to load full page
-        last_height = self.driver.execute_script("return document.body.scrollHeight")
+#     def scroll_page(self, scroll_pause_time=1):
+#         # scroll to load full page
+#         last_height = self.driver.execute_script("return document.body.scrollHeight")
 
-        while True:
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(scroll_pause_time)
+#         while True:
+#             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+#             time.sleep(scroll_pause_time)
 
-            new_height = self.driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
+#             new_height = self.driver.execute_script("return document.body.scrollHeight")
+#             if new_height == last_height:
+#                 break
+#             last_height = new_height
 
-    def extract(self, link: str, user: Optional[dict] = None):
-        # extract medium article content
-        if self.collection.find_one({"link": link}):
-            logger.info(f"article already exists: {link}")
-            return
+#     def extract(self, link: str, user: Optional[dict] = None):
+#         # extract medium article content
+#         if self.collection.find_one({"link": link}):
+#             logger.info(f"article already exists: {link}")
+#             return
 
-        logger.info(f"starting medium scrape: {link}")
-        self.driver.get(link)
-        self.scroll_page()
+#         logger.info(f"starting medium scrape: {link}")
+#         self.driver.get(link)
+#         self.scroll_page()
 
-        soup = BeautifulSoup(self.driver.page_source, "html.parser")
-        title = soup.find("h1", class_="pw-post-title")
-        subtitle = soup.find("h2", class_="pw-subtitle-paragraph")
+#         soup = BeautifulSoup(self.driver.page_source, "html.parser")
+#         title = soup.find("h1", class_="pw-post-title")
+#         subtitle = soup.find("h2", class_="pw-subtitle-paragraph")
 
-        data = {
-            "Title": title.get_text(strip=True) if title else None,
-            "Subtitle": subtitle.get_text(strip=True) if subtitle else None,
-            "Content": soup.get_text(strip=True),
-        }
+#         data = {
+#             "Title": title.get_text(strip=True) if title else None,
+#             "Subtitle": subtitle.get_text(strip=True) if subtitle else None,
+#             "Content": soup.get_text(strip=True),
+#         }
 
-        doc = {
-            "_id": str(uuid.uuid4()),
-            "link": link,
-            "platform": "medium",
-            "content": data,
-        }
-        if user:
-            doc.update({
-                "author_id": user["id"],
-                "author_full_name": user["full_name"],
-            })
+#         doc = {
+#             "_id": str(uuid.uuid4()),
+#             "link": link,
+#             "platform": "medium",
+#             "content": data,
+#         }
+#         if user:
+#             doc.update({
+#                 "author_id": user["id"],
+#                 "author_full_name": user["full_name"],
+#             })
 
-        try:
-            self.collection.insert_one(doc)
-            logger.info(f"article saved: {link}")
-        except errors.PyMongoError as e:
-            logger.error(f"failed to save article: {e}")
+#         try:
+#             self.collection.insert_one(doc)
+#             logger.info(f"article saved: {link}")
+#         except errors.PyMongoError as e:
+#             logger.error(f"failed to save article: {e}")
 
-        return data
+#         return data
 
-    def close(self):
-        # close web driver
-        self.driver.quit()
+#     def close(self):
+#         # close web driver
+#         self.driver.quit()
