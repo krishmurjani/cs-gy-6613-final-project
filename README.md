@@ -112,10 +112,10 @@ Screenshots and project outputs are available in the `notebooks` directory, cove
 ## ClearML Screenshots
 
 ### ClearML ETL & Training Pipeline Logs
-!(screenshots/1.jpg)
-!(screenshots/2.jpg)
-!(screenshots/3.jpg)
-!(screenshots/4.jpg)
+![ClearML](screenshots/1.jpg)
+![ClearML](screenshots/2.jpg)
+![ClearML](screenshots/3.jpg)
+![ClearML](screenshots/4.jpg)
 
 
 ---
