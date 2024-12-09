@@ -13,7 +13,7 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
 
 ## Repository Structure
 ```
-/ourrepo
+/cs-gy-6613-final-project
 |-- Dockerfile
 |-- docker-compose.yml
 |-- main.py
