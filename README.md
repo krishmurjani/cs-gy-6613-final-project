@@ -131,6 +131,9 @@ Screenshots and project outputs are available in the `notebooks` directory, cove
 ## Project Demo
 
 ![Project Demo](screenshots/5.jpg)
+
+## Docker Containers Running
+
 ![Docker Container](screenshots/6.jpg)
 ---
 
