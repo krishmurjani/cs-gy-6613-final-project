@@ -1,4 +1,4 @@
-# CS-GY-6613 AI Final Project: ROS Query System
+# CS-GY-6613 AI Final Project: ROS Query App
 
 ## Project by:
 - **Shresth Kapoor** (sk11677)
