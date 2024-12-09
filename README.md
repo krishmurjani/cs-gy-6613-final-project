@@ -1,4 +1,4 @@
-# CS-GY-6613 AI Final Project: ROS Query System
+# CS-GY-6613 AI Final Project: ROS Query App
 
 ## Project by:
 - **Shresth Kapoor** (sk11677)
@@ -39,6 +39,31 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
 4. **ClearML:** Orchestrator and experiment tracking system.
 
 ---
+
+## Hugging Face Hub Model Repository
+
+Our finetuned Llama 3.2 model for answering ROS-related queries is hosted on the Hugging Face Hub:
+
+➡️ **[Finetuned Llama 3.2 Model - Hugging Face](https://huggingface.co/krishmurjani/finetuned-llama)**
+
+This repository contains:
+- The finetuned model files.
+- Model card with training, evaluation, and environmental details.
+- Example code for inference using Hugging Face Transformers.
+
+Use the following code to load the model:
+
+```python
+# Load model directly
+from transformers import AutoModel
+model = AutoModel.from_pretrained("krishmurjani/finetuned-llama")
+tokenizer = AutoTokenizer.from_pretrained("krishmurjani/finetuned-llama")
+
+input_text = "How can I navigate to a specific pose using ROS?"
+inputs = tokenizer(input_text, return_tensors="pt")
+outputs = model(**inputs)
+print(outputs)
+```
 
 ## Project Milestones
 
@@ -82,7 +107,7 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
    ```bash
    docker-compose up --build
    ```
-3. Access the Gradio app at [http://localhost:8000](http://localhost:8000).
+3. Access the Gradio app at [http://127.0.0.1:7861/](http://127.0.0.1:7861/).
 
 ---
 
@@ -103,12 +128,27 @@ This project implements a Retrieval-Augmented Generation (RAG) system designed t
 
 ## Screenshots & Results
 Screenshots and project outputs are available in the `notebooks` directory, covering all milestones.
+## Project Demo
+
+![Project Demo](screenshots/5.jpg)
+
+---
+
+## ClearML Screenshots
+
+### ClearML ETL & Training Pipeline Logs
+![ClearML](screenshots/1.jpg)
+![ClearML](screenshots/2.jpg)
+![ClearML](screenshots/3.jpg)
+![ClearML](screenshots/4.jpg)
+
 
 ---
 
 ## Acknowledgments
-- **GitHub IDs:** sk11677, km6520
-- **HuggingFace Hub:** Custom finetuned models uploaded.
+- **GitHub IDs:** - ([Krish Murjani](https://github.com/krishmurjani)) & ([Shresth Kapoor](https://github.com/shresthkapoor7))
+- **Hugging Face IDs:** ([Krish Murjani](https://huggingface.co/krishmurjani)) & ([Shresth Kapoor ](https://huggingface.co/shresthkapoor7))
+- **HuggingFace Hub:** Custom finetuned models uploaded above. [Jump to Hugging Face Section](#hugging-face-hub-model-repository)
 
 ---
 
