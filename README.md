@@ -1,4 +1,4 @@
-# ROS Query App — RAG-Powered Q&A for Robot Operating System
+# RAG System: ROS Query App
 
 > **CS-GY-6613: Artificial Intelligence | NYU Tandon School of Engineering**
 > Shresth Kapoor (sk11677) · Krish Murjani (km6520)
